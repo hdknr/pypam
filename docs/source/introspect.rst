@@ -5,13 +5,13 @@ Token Introspection
 .. contents::
     :local:
 
-指定されたトークンのメタ情報を取得
-====================================
+Queryt a mete information for given token
+==============================================
 
 - http://tools.ietf.org/html/draft-richer-oauth-introspection-04
 
-メタ情報内容
---------------
+Token Metainfo
+----------------------------
 
 - http://tools.ietf.org/html/draft-richer-oauth-introspection-04#section-2.2
 
@@ -19,45 +19,46 @@ Token Introspection
 .. glossary::
 
     active
-        現在アクティブなトークンだとTrue
+        True if it is currently active.
 
 
     exp
-        有効期限
+        Exipiry
 
 
     iat
-        発行日時
+        Datetime when the token was Issued 
 
     scope
-        トークンに付与された `スコープ <http://tools.ietf.org/html/draft-richer-oauth-introspection-04#section-3.3>`_ 
+        `Scope <http://tools.ietf.org/html/draft-richer-oauth-introspection-04#section-3.3>`_ 
+        given to the token. 
 
 
-nov OPのIntrospection追加実装
-================================
+nov OP Introspection experimental implementation
+=========================================================================
 
-エンドポイント
+Endpoint
 ----------------
 
-- /introspect  URIパスに固定しています。
-- OpenID ConnectでのIntrospectionの言及はないので、OpenID Configurationで共有するなりする必要があるかと思います。
-- 現在の実装では OpenID Connect のToken Endpointで返されたトークンに関するメタ情報をかえすようにしていて、ID Token および Access Tokenのイントロスペクトされたメタ情報は同じになるようにしています。 
+- /introspect 
+- Becase this endpoint is not specified in OpenID Connect,
+  OpenID Configuration should be extened to negotiate this endppint.
+- Current implementation returns metainfo for tokens retunredn at OpenID Connect Token Endpoint.
+  And both(ID Token & Access Token) of metainfo are the same.
+
+Request Authentication
+------------------------------------
+
+- Current implementation uses access token returned as token for introspection.
+- This token is for to access UserInfo.
+- Introspection authentication procdure and credentials should be negotiated throgh OpneID Configration or Dynamic Registartion.
 
 
-リクエスト認証
-------------------
-
-- リクエスト認証としてはいくつか考えられますが、今回は OpenID Connectで認証した際にToken Endpointで返されるアクセストークンを使っています。
-- このアクセストークンは本来UserInfoをアクセスする時に使われるものです。
-- OpenID Connect でIntrospectionに使用する認証手段するべきでしょう。
+Testing
+--------
 
 
-テスト
-======
-
-- RPにアクセスして、OP識別子とスコープをいれ、OpenID認証を開始します
-- OPでログインしてOpenID Connect認証をします。 
-- ユーティリティを実行して、最新のOpenID Connect認証で取得したID Token, Access Tokenのメタ情報を取得します。
+Fetch latest access token's meta info:
 
     .. code-block:: bash
 
@@ -68,7 +69,7 @@ nov OPのIntrospection追加実装
         u'active': True, u'exp': 1383692233, 
         u'aud': [u'f0a28fef9df969f99c0c78b8bf292479']}
 
-    - トークンが無効の場合 ( エンドポイントのトークン認証エラー )
+Error case:
 
     .. code-block:: bash
 
